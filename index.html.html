@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador de Precio</title>
+</head>
+<body>
+    <h2>Visualizador de Precio</h2>
+    <div id="priceContainer">Cargando precio...</div>
+
+    <script type="text/javascript">
+        const puppeteer = require('puppeteer');
+
+        (async () => {
+            const browser = await puppeteer.launch({ headless: true });
+            const page = await browser.newPage();
+            await page.goto('https://www.lawebdelcolchon.es/content/products/Colchones/554-Colchon-Visco-Cama-Nido.php?ida=96541&op=0');
+
+            const price = await page.evaluate(() => {
+                const priceElement = document.evaluate('//*[@id="precioFinal"]/text()', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+                return priceElement ? priceElement.textContent.trim() : 'Precio no disponible';
+            });
+
+            document.getElementById('priceContainer').innerText = `Precio: ${price}`;
+            
+            await browser.close();
+        })();
+    </script>
+</body>
+</html>
